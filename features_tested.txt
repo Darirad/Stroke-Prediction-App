@@ -1,0 +1,53 @@
+data["Age_Hypertension"] = data["age"] * data["hypertension"]
+
+work_type_bmi_mean = data.groupby("work_type")["bmi"].mean().to_dict()
+data["bmi_x_worktype_mean"] = data["bmi"] * data["work_type"].map(work_type_bmi_mean)
+
+work_type_age_mean = data.groupby("work_type")["age"].mean().to_dict()
+data["age_x_worktype_mean"] = data["age"] * data["work_type"].map(work_type_age_mean)
+
+data["Age_HeartDisease"] = data["age"] * data["heart_disease"]
+
+data["Sedentary_HighBMI"] = (data["work_type"].isin(["Private", "Govt_job"])) & (data["bmi"] > 30).astype(int)
+
+data["age_x_avg_glucose_level"] = data["age"] * data["avg_glucose_level"]
+
+data["risk_score"] = (
+    2 * data["hypertension"] +
+    2 * data["heart_disease"] +
+    (data["avg_glucose_level"] > 140).astype(int) +
+    (data["bmi"] > 30).astype(int) +
+    (data["smoking_status"] == "smokes").astype(int)
+)
+
+data["elderly_working"] = (data["age"] > 65) & (data["work_type"].isin(["Private", "Self-employed"])).astype(int) ## TO DECIDE
+
+data["bmi_in_range"] = ((data["bmi"] >= 18.5) & (data["bmi"] <= 25)).astype(int)
+
+bins = [0, 35, 55, 75, 120]
+labels = ["young", "mid_age", "senior", "elderly"]
+data["age_group"] = pd.cut(data["age"], bins=bins, labels=labels)
+
+data["high_glucose_heart_disease"] = (
+    (data["avg_glucose_level"] > 140) & (data["heart_disease"] == 1)
+).astype(int)
+
+data["Composite_Risk"] = (
+    0.3 * data["age"] +
+    0.2 * data["hypertension"] +
+    0.2 * data["heart_disease"] +
+    0.1 * data["bmi"] +
+    0.1 * ((data["smoking_status"] == "smokes") | (data["smoking_status"] == "formerly smoked")) +
+    0.1 * (data["work_type"] == "Private")
+)
+
+data["worktype_smoker"] = (
+    (data["work_type"] == "Self-employed") & (data["smoking_status"] == "never smoked")
+).astype(int)
+
+data["Unmarried_LowBMI"] = (data["ever_married"] == "No") * data["bmi"]
+
+work_type_bmi_mean = data.groupby("work_type")["bmi"].mean().to_dict()
+data["bmi_x_worktype_mean"] = data["bmi"] - data["work_type"].map(work_type_bmi_mean)
+
+data["Smoker_Unmarried"] = (data["smoking_status"] == "smokes") & (data["ever_married"] == "No").astype(int)

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Risk Prediction Tool</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --light: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        
+        .btn {
+            grid-column: span 2;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left: 5px solid var(--danger);
+            font-size: 1.5rem;
+        }
+        
+        .success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 5px solid var(--success);
+            font-size: 1.5rem;
+        }
+        
+        .info {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 5px solid var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stroke Risk Prediction</h1>
+        
+        <form method="POST">
+            <div class="form-grid">
+                <!-- Column 1 -->
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" name="age" min="1" max="120" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="hypertension">Hypertension</label>
+                    <select name="hypertension" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="heart_disease">Heart Disease</label>
+                    <select name="heart_disease" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="avg_glucose_level">Glucose Level (mg/dL)</label>
+                    <input type="number" step="0.1" name="avg_glucose_level" min="50" max="300" required>
+                </div>
+                
+                <!-- Column 2 -->
+                <div class="form-group">
+                    <label for="bmi">BMI</label>
+                    <input type="number" step="0.1" name="bmi" min="10" max="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ever_married">Marital Status</label>
+                    <select name="ever_married" required>
+                        <option value="Yes">Married</option>
+                        <option value="No">Not Married</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="work_type">Work Type</label>
+                    <select name="work_type" required>
+                        <option value="Private">Private Sector</option>
+                        <option value="Self-employed">Self-Employed</option>
+                        <option value="Govt_job">Government Job</option>
+                        <option value="children">Student/Child</option>
+                    </select>
+                </div>
+                
+                <!-- Full-width fields -->
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="Residence_type">Residence Type</label>
+                    <select name="Residence_type" required>
+                        <option value="Urban">Urban</option>
+                        <option value="Rural">Rural</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="smoking_status">Smoking Status</label>
+                    <select name="smoking_status" required>
+                        <option value="never smoked">Never Smoked</option>
+                        <option value="formerly smoked">Former Smoker</option>
+                        <option value="smokes">Current Smoker</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Predict Stroke Risk</button>
+            </div>
+        </form>
+        
+        {% if prediction_threshold is not none %}
+            <div id="predictionResult" class="result {% if prediction_threshold == 1 %}danger{% else %}success{% endif %}">
+                {% if prediction_threshold == 1 %}
+                    <h2>⚠️ High Stroke Risk Detected</h2>
+                    <p>You have a <strong>high likelihood</strong> of experiencing a stroke based on the provided data.</p>
+                {% else %}
+                    <h2>✅ Low Stroke Risk</h2>
+                    <p>You have a <strong>low likelihood</strong> of experiencing a stroke based on the provided data.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="result info">
+                <p>Please fill out all fields to get a stroke risk prediction.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const predictionResult = document.getElementById('predictionResult');
+            if (predictionResult) {
+                predictionResult.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>   
+</body>
+</html>
